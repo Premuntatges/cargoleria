@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestió de Cargoleria</title>
+
+<style>
+:root {
+  --bg: #0f1117;
+  --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-code: 'Courier New', Courier, monospace;
+  --surface: #181c26;
+  --surface2: #1f2433;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.15);
+  --text: #e8eaf0;
+  --text2: #8b90a0;
+  --text3: #555b6e;
+  --accent: #4f8ef7;
+  --accent-bg: rgba(79,142,247,0.12);
+  --accent-border: rgba(79,142,247,0.3);
+  --warn: #f5a623;
+  --warn-bg: rgba(245,166,35,0.1);
+  --warn-border: rgba(245,166,35,0.3);
+  --danger: #f07070;
+  --danger-bg: rgba(240,112,112,0.1);
+  --success: #5ec97a;
+  --success-bg: rgba(94,201,122,0.1);
+  --success-border: rgba(94,201,122,0.3);
+  --radius: 10px;
+  --radius-lg: 16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-ui);font-size:14px}
+body{display:flex;flex-direction:column;min-height:100vh}
+
+/* TOPBAR */
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;flex-shrink:0}
+.topbar-logo{display:flex;align-items:center;gap:10px}
+.logo-mark{width:28px;height:28px;background:var(--accent);border-radius:6px;display:flex;align-items:center;justify-content:center}
+.logo-mark svg{width:16px;height:16px;fill:white}
+.topbar-title{font-size:15px;font-weight:600;letter-spacing:-0.01em}
+.topbar-week{font-size:12px;color:var(--text2);font-family:var(--font-code)}
+.view-toggle{display:flex;gap:4px;background:var(--bg);padding:3px;border-radius:8px;border:1px solid var(--border)}
+.vtbtn{padding:5px 16px;border-radius:6px;border:none;background:transparent;font-size:13px;cursor:pointer;color:var(--text2);font-family:var(--font-ui);transition:all 0.15s}
+.vtbtn:hover{color:var(--text)}
+.vtbtn.active{background:var(--surface2);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,0.3)}
+
+/* MAIN */
+.main{flex:1;overflow-y:auto;padding:24px}
+.screen{max-width:900px;margin:0 auto}
+
+/* SECTION SELECT */
+.screen-label{font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:14px}
+.section-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
+.sec-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px 14px;cursor:pointer;transition:all 0.15s;position:relative;overflow:hidden}
+.sec-card:hover{border-color:var(--border2);background:var(--surface2)}
+.sec-card.has-pending{border-color:var(--warn-border)}
+.sec-card-name{font-size:14px;font-weight:500;margin-bottom:6px}
+.sec-card-sub{font-size:12px;color:var(--text3)}
+.sec-card.has-pending .sec-card-sub{color:var(--warn)}
+.sec-dot{width:6px;height:6px;border-radius:50%;background:var(--warn);position:absolute;top:14px;right:14px}
+
+/* PETICIO */
+.back-row{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.back-btn{background:transparent;border:1px solid var(--border);border-radius:8px;padding:5px 12px;color:var(--text2);font-size:13px;cursor:pointer;font-family:var(--font-ui);transition:all 0.15s}
+.back-btn:hover{border-color:var(--border2);color:var(--text)}
+.page-title{font-size:18px;font-weight:600;letter-spacing:-0.02em}
+
+.banner{background:var(--warn-bg);border:1px solid var(--warn-border);border-radius:var(--radius);padding:10px 14px;margin-bottom:16px;font-size:13px;color:var(--warn);display:flex;align-items:center;gap:8px}
+.banner-dot{width:6px;height:6px;border-radius:50%;background:var(--warn);flex-shrink:0}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden}
+.card-head{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-title{font-size:13px;font-weight:500;color:var(--text)}
+.card-sub{font-size:12px;color:var(--text3)}
+.card-body{padding:16px}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}
+.form-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.mode-toggle{display:flex;gap:0;margin-bottom:14px;border:1px solid var(--border);border-radius:8px;overflow:hidden;width:fit-content}
+.mode-btn{padding:6px 16px;border:none;background:transparent;font-size:12px;cursor:pointer;color:var(--text3);font-family:var(--font-ui);transition:all 0.15s;border-right:1px solid var(--border)}
+.mode-btn:last-child{border-right:none}
+.mode-btn:hover{color:var(--text2);background:var(--surface2)}
+.mode-btn.active{background:var(--surface2);color:var(--text)}
+.search-bar{width:100%;padding:8px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:13px;font-family:var(--font-ui);margin-bottom:14px;outline:none;transition:border-color 0.15s}
+.search-bar:focus{border-color:var(--accent)}
+.search-bar::placeholder{color:var(--text3)}
+.cat-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);padding:0 0 6px;display:block}
+.quick-list{display:flex;flex-direction:column;gap:4px}
+.quick-item{display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;cursor:pointer;transition:all 0.15s;gap:10px}
+.quick-item:hover{border-color:var(--accent);background:var(--accent-bg)}
+.quick-item-left{display:flex;flex-direction:column;gap:2px}
+.quick-item-name{font-size:13px;color:var(--text);font-weight:500}
+.quick-item-ref{font-size:11px;font-family:var(--font-code);color:var(--accent)}
+.quick-item-add{font-size:11px;color:var(--text3);white-space:nowrap;padding:3px 10px;border:1px solid var(--border);border-radius:6px;background:transparent;cursor:pointer;font-family:var(--font-ui);transition:all 0.15s}
+.quick-item:hover .quick-item-add{border-color:var(--accent);color:var(--accent)}
+.field label{display:block;font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px}
+select,input[type=number],input[type=text]{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 11px;color:var(--text);font-size:13px;font-family:var(--font-ui);outline:none;transition:border-color 0.15s;appearance:none;-webkit-appearance:none}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238b90a0' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+select:focus,input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,142,247,0.1)}
+select option{background:var(--surface2)}
+
+.ref-preview{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;min-height:42px}
+.ref-code{font-family:var(--font-code);font-size:15px;font-weight:500;color:var(--accent);letter-spacing:0.02em}
+.ref-placeholder{font-size:12px;color:var(--text3)}
+
+.form-bottom{display:flex;align-items:flex-end;gap:10px}
+.form-bottom .field{flex:0 0 80px}
+.btn-add{background:var(--accent);color:white;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font-ui);transition:all 0.15s;white-space:nowrap}
+.btn-add:hover{opacity:0.9}
+.btn-add:disabled{opacity:0.4;cursor:not-allowed}
+
+/* TABLE */
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:8px 12px;color:var(--text3);font-weight:500;font-size:11px;text-transform:uppercase;letter-spacing:0.06em;border-bottom:1px solid var(--border)}
+td{padding:9px 12px;border-bottom:1px solid var(--border);vertical-align:middle;color:var(--text)}
+tr:last-child td{border-bottom:none}
+tr.pend1{background:rgba(245,166,35,0.04)}
+tr.pend2{background:rgba(240,112,112,0.05)}
+.week-tag{display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(255,255,255,0.05);color:var(--text3);margin-left:6px;font-family:var(--font-code)}
+.week-tag.old{background:var(--danger-bg);color:var(--danger)}
+.week-tag.recent{background:var(--warn-bg);color:var(--warn)}
+.ref-mono{font-family:var(--font-code);font-size:12px;color:var(--accent)}
+.loc-text{font-size:12px;color:var(--text2)}
+.qty-badge{display:inline-flex;align-items:center;justify-content:center;background:var(--warn-bg);color:var(--warn);border-radius:6px;padding:2px 8px;font-weight:600;font-size:13px;font-family:var(--font-code)}
+.qty-input{width:56px;text-align:center;padding:5px 8px;background:var(--bg);border:1px solid var(--border);border-radius:7px;color:var(--text);font-size:13px;font-family:var(--font-code)}
+.del-btn{background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--text3);width:28px;height:28px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.del-btn:hover{border-color:var(--danger);color:var(--danger)}
+
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:5px;font-weight:500}
+.badge-pend{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-border)}
+.badge-done{background:var(--success-bg);color:var(--success);border:1px solid var(--success-border)}
+.badge-stock{background:var(--danger-bg);color:var(--danger);border:1px solid rgba(240,112,112,0.3)}
+.badge-parcial{background:rgba(79,142,247,0.1);color:var(--accent);border:1px solid rgba(79,142,247,0.3)}
+
+.card-actions{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px}
+.btn-send{background:var(--success-bg);color:var(--success);border:1px solid var(--success-border);border-radius:8px;padding:8px 20px;font-size:13px;font-weight:500;cursor:pointer;font-family:var(--font-ui);transition:all 0.15s}
+.btn-send:hover{background:var(--success);color:#0f1117}
+.btn-clear{background:transparent;color:var(--text3);border:1px solid var(--border);border-radius:8px;padding:8px 16px;font-size:13px;cursor:pointer;font-family:var(--font-ui);transition:all 0.15s}
+.btn-clear:hover{border-color:var(--border2);color:var(--text2)}
+
+/* CARGOLERIA */
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px}
+.stat-lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px}
+.stat-val{font-size:24px;font-weight:600;font-family:var(--font-code)}
+.stat-val.warn{color:var(--warn)}
+.stat-val.ok{color:var(--success)}
+
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.filter-btn{background:transparent;border:1px solid var(--border);border-radius:7px;padding:5px 13px;font-size:12px;cursor:pointer;color:var(--text3);font-family:var(--font-ui);transition:all 0.15s}
+.filter-btn:hover{border-color:var(--border2);color:var(--text2)}
+.filter-btn.active{background:var(--surface2);border-color:var(--border2);color:var(--text)}
+.filter-row-right{margin-left:auto}
+
+.status-sel{font-size:12px;padding:5px 24px 5px 9px;border-radius:7px;border:1px solid var(--border);background:var(--bg);background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%238b90a0' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;cursor:pointer;color:var(--text);font-family:var(--font-ui);width:130px;appearance:none;-webkit-appearance:none;outline:none;transition:border-color 0.15s}
+.status-sel:focus{border-color:var(--accent)}
+.status-sel option{background:var(--surface2)}
+
+.export-btn{background:transparent;border:1px solid var(--border);border-radius:7px;padding:5px 13px;font-size:12px;cursor:pointer;color:var(--text3);font-family:var(--font-ui);transition:all 0.15s;display:flex;align-items:center;gap:6px}
+.export-btn:hover{border-color:var(--border2);color:var(--text2)}
+
+.empty{text-align:center;padding:36px;color:var(--text3);font-size:13px}
+.seccio-header{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);padding:10px 12px 6px;background:var(--bg);border-bottom:1px solid var(--border)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--success-bg);color:var(--success);border:1px solid var(--success-border);border-radius:10px;padding:11px 18px;font-size:13px;font-weight:500;display:none;z-index:999;backdrop-filter:blur(10px)}
+.toast.show{display:block;animation:fadeIn 0.2s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 16 16"><path d="M3 8h10M8 3v10" stroke="white" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+    </div>
+    <span class="topbar-title">Cargoleria</span>
+  </div>
+  <span class="topbar-week" id="wk-label"></span>
+  <div class="view-toggle">
+    <button class="vtbtn active" onclick="setView('peticio')">Petició</button>
+    <button class="vtbtn" onclick="setView('cargoleria')">Cargoleria</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="screen" id="main-content"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SECCIONS = ['Intralox','Intralox P9','Handling','Rodets','Rodets P8','Corbes','Formadores','Tancadores','Paletització','Elèctrics MXP','General'];
+const TIPOLOGIES = ['Sisawat','Cap polit','Cap rodo','De carro'];
+const METRICS = [3,4,5,6,8,10];
+const LONGITUDS = [10,16,20,25,30,35,40,45,50,55,60,65,70,80];
+
+const CATALEG = {
+  'Intralox': [
+    { grup: 'Transportadors rectes', items: [
+      { nom: 'Eix costelles',            tip: 'CAP POLIT',    din: '117871', met: '10', lon: '16' },
+      { nom: 'Reenvios',                 tip: 'CAP POLIT',    din: '117871', met: '10', lon: '16' },
+      { nom: 'Plàstic costelles',        tip: 'SISAWAT',      din: '933',    met: '6',  lon: '25' },
+      { nom: 'Plàstic perfil superior',  tip: 'CAP POLIT',    din: '117874', met: '10', lon: '45' },
+      { nom: 'Plàstic inferior plegada', tip: 'CAP POLIT',    din: '',       met: '8',  lon: '50' },
+    ]},
+    { grup: 'Transportadors corba', items: [
+      { nom: 'Plàstic superior corba',   tip: 'SISAWAT',      din: '933',    met: '8',  lon: '30' },
+      { nom: 'Plàstic inferior corba',   tip: 'SISAWAT',      din: '933',    met: '8',  lon: '40' },
+    ]},
+    { grup: 'Motoritzaci\u00f3', items: [
+      { nom: 'Coixinet quadrado',        tip: 'CAP ROD\u00d3',    din: '7380',   met: '10', lon: '30' },
+      { nom: 'Coixinet negro',           tip: 'CARGOL CARRO', din: '603',    met: '8',  lon: '35' },
+      { nom: 'Cadireta suport motor',    tip: 'CAP POLIT',    din: '117871', met: '10', lon: '16' },
+      { nom: 'Guitarra',                 tip: 'SISAWAT',      din: '933',    met: '10', lon: '30' },
+      { nom: 'Guitarra motor',           tip: 'SISAWAT',      din: '933',    met: '8',  lon: '30' },
+      { nom: 'Moneda motor',             tip: 'AVELLANAT',    din: '7991',   met: '10', lon: '16' },
+      { nom: 'Protecci\u00f3 motor inferior', tip: 'CAP ROD\u00d3',    din: '7380',   met: '6',  lon: '10' },
+      { nom: 'Tuerca autoblocant',       tip: 'TUERCA',       din: '985',    met: '8',  lon: ''   },
+      { nom: 'Tuerca autoblocant',       tip: 'TUERCA',       din: '985',    met: '10', lon: ''   },
+      { nom: 'Tuerca',                   tip: 'TUERCA',       din: '934',    met: '8',  lon: ''   },
+      { nom: 'Grower',                   tip: 'GROWER',       din: '127',    met: '8',  lon: ''   },
+      { nom: 'Grower',                   tip: 'GROWER',       din: '127',    met: '10', lon: ''   },
+      { nom: 'Arandela gran',            tip: 'ARANDELA',     din: '9021',   met: '10', lon: ''   },
+      { nom: 'Arandela gran',            tip: 'ARANDELA',     din: '9021',   met: '6',  lon: ''   },
+    ]},
+  ],
+  'Rodets': [
+    { grup: 'Transportadors rectes', items: [
+      { nom: 'Rodillos',                     tip: 'CAP POLIT',  din: '117871', met: '10', lon: '16'  },
+      { nom: 'Rodillo amb suport barandilla', tip: 'CAP POLIT',  din: '117872', met: '10', lon: '25'  },
+      { nom: 'Reenv\u00edo',                      tip: 'CAP POLIT',  din: '117871', met: '10', lon: '50'  },
+      { nom: 'Reenv\u00edo de motor',             tip: 'CAP POLIT',  din: '117875', met: '10', lon: '60'  },
+      { nom: 'Arandela gran especial',        tip: 'ARANDELA',   din: '9021',   met: '8',  lon: ''    },
+      { nom: 'Arandela gran (M8 agujero 10)', tip: 'ARANDELA',   din: '9021',   met: '8',  lon: ''    },
+      { nom: 'Atrapadedos blanc',             tip: 'CAP POLIT',  din: '',       met: '6',  lon: '35'  },
+      { nom: 'Tuerca autoblocant',            tip: 'TUERCA',     din: '985',    met: '6',  lon: ''    },
+    ]},
+    { grup: 'Motoritzaci\u00f3 petit', items: [
+      { nom: 'Cadireta motor petit', tip: 'SISAWAT',   din: '933',  met: '6',  lon: '25'  },
+      { nom: 'Arandela',             tip: 'ARANDELA',  din: '125',  met: '6',  lon: ''    },
+      { nom: 'Moneda motor',         tip: 'AVELLANAT', din: '',     met: '5',  lon: '16'  },
+      { nom: 'Grower',               tip: 'GROWER',    din: '127',  met: '6',  lon: ''    },
+      { nom: 'Tuerca',               tip: 'TUERCA',    din: '934',  met: '6',  lon: ''    },
+      { nom: 'Polea motor petit',    tip: 'SISAWAT',   din: '',     met: '6',  lon: '10'  },
+      { nom: 'Arandela gran',        tip: 'ARANDELA',  din: '9021', met: '6',  lon: ''    },
+      { nom: 'Tensor',               tip: 'SISAWAT',   din: '',     met: '10', lon: '120' },
+      { nom: 'Arandela gran',        tip: 'ARANDELA',  din: '9021', met: '10', lon: ''    },
+      { nom: 'Tuerca',               tip: 'TUERCA',    din: '934',  met: '10', lon: ''    },
+    ]},
+    { grup: 'Motoritzaci\u00f3 gran', items: [
+      { nom: 'Cadireta motor gran', tip: 'SISAWAT',   din: '933',  met: '8',  lon: '25'  },
+      { nom: 'Arandela',            tip: 'ARANDELA',  din: '125',  met: '8',  lon: ''    },
+      { nom: 'Moneda motor',        tip: 'AVELLANAT', din: '7991', met: '10', lon: '16'  },
+      { nom: 'Grower',              tip: 'GROWER',    din: '',     met: '8',  lon: ''    },
+      { nom: 'Tuerca',              tip: 'TUERCA',    din: '934',  met: '8',  lon: ''    },
+      { nom: 'Polea motor gran',    tip: 'SISAWAT',   din: '933',  met: '8',  lon: '20'  },
+      { nom: 'Arandela gran',       tip: 'ARANDELA',  din: '9021', met: '8',  lon: ''    },
+      { nom: 'Tensor',              tip: 'SISAWAT',   din: '933',  met: '10', lon: '120' },
+      { nom: 'Arandela gran',       tip: 'ARANDELA',  din: '9021', met: '10', lon: ''    },
+      { nom: 'Tuerca',              tip: 'TUERCA',    din: '934',  met: '10', lon: ''    },
+    ]},
+  ],
+  'Handling': [
+    { grup: 'Transportadors rectes', items: [
+      { nom: 'Travesa\u00f1os',                tip: 'DE CARRO',    din: '603',    met: '8',  lon: '20'  },
+      { nom: 'Travesa\u00f1os amb barandilla', tip: 'DE CARRO',    din: '603',    met: '8',  lon: '25'  },
+      { nom: 'Nylon superior',             tip: 'SISAWAT',     din: '933',    met: '6',  lon: '45'  },
+      { nom: 'Arandela gran',              tip: 'ARANDELA',    din: '9021',   met: '6',  lon: ''    },
+      { nom: 'Tuerca autoblocant',         tip: 'TUERCA',      din: '985',    met: '6',  lon: ''    },
+      { nom: 'Mediaslunas',                tip: 'SISAWAT',     din: '933',    met: '6',  lon: '35'  },
+      { nom: 'Reenv\u00edo especial',          tip: '',            din: '115298', met: '8',  lon: '10'  },
+      { nom: 'Nylon inferior',             tip: 'AUTOROSCADO', din: '7976',   met: '6',  lon: '16'  },
+      { nom: 'Placa seguretat motor',      tip: 'CAP POLIT',   din: '',       met: '8',  lon: '16'  },
+      { nom: 'Omega i placa motor',        tip: 'CAP POLIT',   din: '',       met: '8',  lon: '35'  },
+      { nom: 'Tuerca autoblocant',         tip: 'TUERCA',      din: '',       met: '8',  lon: ''    },
+      { nom: 'Omega i placa reenv\u00edo',     tip: 'AVELLANAT',   din: '7991',   met: '8',  lon: '35'  },
+      { nom: 'Coixinet',                   tip: 'SISAWAT',     din: '933',    met: '10', lon: '35'  },
+      { nom: 'Autoblocant',                tip: 'TUERCA',      din: '985',    met: '10', lon: ''    },
+      { nom: 'Arandela gran',              tip: 'ARANDELA',    din: '9021',   met: '10', lon: ''    },
+    ]},
+  ],
+  'El\u00e8ctrics MXP': [
+    { grup: 'Calaix 1 \u2014 Pneum\u00e0tica de 4', items: [
+      { nom: 'Taps tub de 4',                  tip: '', din: 'FES.153267', met: '', lon: '' },
+      { nom: 'Colze regulable de 4 rosca M5',  tip: '', din: 'FES.153148', met: '', lon: '' },
+      { nom: 'Y de 4',                         tip: '', din: 'FES.153056', met: '', lon: '' },
+      { nom: 'Pipeta de 4',                    tip: '', din: 'FES.153056', met: '', lon: '' },
+      { nom: 'Racor recte de 4 rosca 1/8',     tip: '', din: 'FES.558661', met: '', lon: '' },
+      { nom: 'Colze de 4 rosca 1/4',           tip: '', din: 'FES.190659', met: '', lon: '' },
+      { nom: 'Manguito de 4',                  tip: '', din: 'FES.153031', met: '', lon: '' },
+      { nom: 'Racor recte de 4 rosca 1/8',     tip: '', din: 'FES.153001', met: '', lon: '' },
+      { nom: 'Colze de 4 rosca M5',            tip: '', din: 'FES.153333', met: '', lon: '' },
+      { nom: 'Colze de 4',                     tip: '', din: 'FES.153070', met: '', lon: '' },
+      { nom: 'Colze regulable de 4 rosca 1/8', tip: '', din: 'FES.193143', met: '', lon: '' },
+      { nom: 'Colze de 4 rosca 1/8',           tip: '', din: 'FES.153045', met: '', lon: '' },
+      { nom: 'Te de 4',                        tip: '', din: 'FES.153128', met: '', lon: '' },
+    ]},
+    { grup: 'Calaix 2 \u2014 Pneum\u00e0tica de 6', items: [
+      { nom: 'Colze regulable de 6 rosca M5',  tip: '', din: 'FES.193139', met: '', lon: '' },
+      { nom: 'Y de 6',                         tip: '', din: 'FES.153149', met: '', lon: '' },
+      { nom: 'Pipeta de 6',                    tip: '', din: 'FES.153057', met: '', lon: '' },
+      { nom: 'Colze regulable de 6 rosca 1/8', tip: '', din: 'FES.193144', met: '', lon: '' },
+      { nom: 'Colze de 6 rosca 1/4',           tip: '', din: 'FES.153047', met: '', lon: '' },
+      { nom: 'Manguito de 6',                  tip: '', din: 'FES.153032', met: '', lon: '' },
+      { nom: 'Colze regulable de 6 rosca 1/4', tip: '', din: 'FES.193146', met: '', lon: '' },
+      { nom: 'Colze de 6 rosca 1/8',           tip: '', din: 'FES.153071', met: '', lon: '' },
+      { nom: 'Colze de 6',                     tip: '', din: 'FES.153041', met: '', lon: '' },
+      { nom: 'Reducci\u00f3 de 6 a 4',             tip: '', din: 'FES.153268', met: '', lon: '' },
+      { nom: 'Tap de 6',                       tip: '', din: 'FES.153002', met: '', lon: '' },
+      { nom: 'Racor recte de 6 rosca 1/8',     tip: '', din: 'FES.153335', met: '', lon: '' },
+      { nom: 'Colze de 6 rosca M5',            tip: '', din: 'FES.153129', met: '', lon: '' },
+      { nom: 'Te de 6',                        tip: '', din: '',           met: '', lon: '' },
+    ]},
+    { grup: 'Calaix 3 \u2014 Pneum\u00e0tica de 8', items: [
+      { nom: 'Colze regulable de 8 rosca 1/8', tip: '', din: 'FES.193145', met: '', lon: '' },
+      { nom: 'Y de 8',                         tip: '', din: 'FES.153050', met: '', lon: '' },
+      { nom: 'Pipeta de 8',                    tip: '', din: 'FES.153058', met: '', lon: '' },
+      { nom: 'Colze regulable de 8 rosca 1/4', tip: '', din: 'FES.193147', met: '', lon: '' },
+      { nom: 'Colze de 8 rosca 1/4',           tip: '', din: 'FES.153049', met: '', lon: '' },
+      { nom: 'Manguito de 8',                  tip: '', din: 'FES.153033', met: '', lon: '' },
+      { nom: 'Reducci\u00f3 de 8 a 6',             tip: '', din: 'FES.153042', met: '', lon: '' },
+      { nom: 'Colze de 8 rosca 1/8',           tip: '', din: 'FES.153048', met: '', lon: '' },
+      { nom: 'Colze de 8',                     tip: '', din: 'FES.153072', met: '', lon: '' },
+      { nom: 'Tap de 8',                       tip: '', din: 'FES.153269', met: '', lon: '' },
+      { nom: 'Racor recte de 6 rosca 1/8',     tip: '', din: 'FES.153004', met: '', lon: '' },
+      { nom: 'Colze regulable de 8 rosca 3/8', tip: '', din: 'FES.193150', met: '', lon: '' },
+      { nom: 'Te de 8',                        tip: '', din: 'FES.153130', met: '', lon: '' },
+    ]},
+    { grup: 'Calaix 4 \u2014 Pneum\u00e0tica de 10', items: [
+      { nom: 'Colze regulable de 10 rosca 3/8', tip: '', din: 'FES.193151', met: '', lon: '' },
+      { nom: 'Y de 10',                         tip: '', din: 'FES.153151', met: '', lon: '' },
+      { nom: 'Pipeta de 10',                    tip: '', din: 'FES.153059', met: '', lon: '' },
+      { nom: 'Colze de 10 rosca 1/4',           tip: '', din: 'FES.153051', met: '', lon: '' },
+      { nom: 'Manguito de 10',                  tip: '', din: 'FES.153034', met: '', lon: '' },
+      { nom: 'Reducci\u00f3 de 12 a 8',             tip: '', din: 'FES.153043', met: '', lon: '' },
+      { nom: 'Colze de 10 rosca 1/2',           tip: '', din: 'FES.558718', met: '', lon: '' },
+      { nom: 'Colze de 10',                     tip: '', din: 'FES.153073', met: '', lon: '' },
+      { nom: 'Tap de 10',                       tip: '', din: 'FES.153270', met: '', lon: '' },
+      { nom: 'Racor recte de 10 rosca 1/4',     tip: '', din: 'FES.153007', met: '', lon: '' },
+      { nom: 'Racor recte de 10 rosca 3/8',     tip: '', din: 'FES.153008', met: '', lon: '' },
+      { nom: 'Te de 10',                        tip: '', din: 'FES.153131', met: '', lon: '' },
+    ]},
+    { grup: 'Calaix 5 \u2014 Pneum\u00e0tica de 12', items: [
+      { nom: 'Colze de 12 rosca 3/8',       tip: '', din: 'FES.153053', met: '', lon: '' },
+      { nom: 'Y de 12',                     tip: '', din: 'FES.153152', met: '', lon: '' },
+      { nom: 'Pipeta de 12',                tip: '', din: 'FES.153060', met: '', lon: '' },
+      { nom: 'Colze de 12 rosca 1/2',       tip: '', din: 'FES.153054', met: '', lon: '' },
+      { nom: 'Reducci\u00f3 de 12 a 10',       tip: '', din: 'FES.153044', met: '', lon: '' },
+      { nom: 'Manguito de 12',              tip: '', din: 'FES.153035', met: '', lon: '' },
+      { nom: 'Estrella (4 sortides de 12)', tip: '', din: 'FES.153288', met: '', lon: '' },
+      { nom: 'Reducci\u00f3 de 12 a 8',        tip: '', din: 'FES.130624', met: '', lon: '' },
+      { nom: 'Colze',                       tip: '', din: 'FES.153074', met: '', lon: '' },
+      { nom: 'Tap de 12',                   tip: '', din: 'FES.153271', met: '', lon: '' },
+      { nom: 'Reducci\u00f3 de 12 a 6',        tip: '', din: 'FES.132981', met: '', lon: '' },
+      { nom: 'Te de 12',                    tip: '', din: 'FES.153132', met: '', lon: '' },
+    ]},
+    { grup: 'Calaix 7 \u2014 Punteres i varis', items: [
+      { nom: 'Papallones',               tip: '', din: 'GRA.130/23',   met: '', lon: '' },
+      { nom: 'Puntera de 6mm',           tip: '', din: 'WEI.WD902113', met: '', lon: '' },
+      { nom: 'Puntera de 2,5mm',         tip: '', din: 'WEI.WD902574', met: '', lon: '' },
+      { nom: 'Grapa blanca brida M4',    tip: '', din: 'WEI.WD900443', met: '', lon: '' },
+      { nom: 'Manguito pin',             tip: '', din: 'UNEX 1243',    met: '', lon: '' },
+      { nom: 'Puntera doble de 1,5mm',   tip: '', din: 'WEI.WD901854', met: '', lon: '' },
+      { nom: 'Puntera 0,5mm',            tip: '', din: 'WEI.WD901940', met: '', lon: '' },
+      { nom: 'Puntera 0,75mm',           tip: '', din: 'WEI.WD902123', met: '', lon: '' },
+      { nom: 'Grapa adhesiva',           tip: '', din: 'UXB1256',      met: '', lon: '' },
+      { nom: 'Terminal forquilla 2,5mm', tip: '', din: 'BM00220',      met: '', lon: '' },
+      { nom: 'Puntera 1mm',              tip: '', din: 'WEI.WD901942', met: '', lon: '' },
+      { nom: 'Terminal 2,5mm',           tip: '', din: 'BM.BM00219',   met: '', lon: '' },
+      { nom: 'Punteres negres',          tip: '', din: 'WEI.WD901943', met: '', lon: '' },
+      { nom: 'Manguito llarg',           tip: '', din: 'GRAF.140/15',  met: '', lon: '' },
+      { nom: 'Terminal forquilla 1,5mm', tip: '', din: 'BM.BM00120',   met: '', lon: '' },
+    ]},
+    { grup: 'Calaix 8 \u2014 Retr\u00e0ctil i varis', items: [
+      { nom: 'Suport magn\u00e8tic',    tip: '', din: 'E11877',    met: '', lon: '' },
+      { nom: 'Teflon',            tip: '', din: '8646890',   met: '', lon: '' },
+      { nom: 'Cinta blanca',      tip: '', din: '',          met: '', lon: '' },
+      { nom: 'Cinta vermella',    tip: '', din: '',          met: '', lon: '' },
+      { nom: 'Cinta groga',       tip: '', din: '',          met: '', lon: '' },
+      { nom: 'Cinta negre',       tip: '', din: '',          met: '', lon: '' },
+      { nom: 'Grapa per malla',   tip: '', din: '87601006',  met: '', lon: '' },
+      { nom: 'Grapa per guia DIN',tip: '', din: '887601030', met: '', lon: '' },
+      { nom: 'Retr\u00e0ctil 1,60',    tip: '', din: '',         met: '', lon: '' },
+      { nom: 'Retr\u00e0ctil 2,40',    tip: '', din: '',         met: '', lon: '' },
+      { nom: 'Retr\u00e0ctil 4,80',    tip: '', din: '',         met: '', lon: '' },
+      { nom: 'Retr\u00e0ctil 6,40',    tip: '', din: '',         met: '', lon: '' },
+      { nom: 'Retr\u00e0ctil 9,50',    tip: '', din: '',         met: '', lon: '' },
+      { nom: 'Retr\u00e0ctil 12,7',    tip: '', din: '',         met: '', lon: '' },
+      { nom: 'Retr\u00e0ctil 19,1',    tip: '', din: '',         met: '', lon: '' },
+      { nom: 'Y IFM 113',         tip: '', din: 'EBC.113',   met: '', lon: '' },
+    ]},
+    { grup: 'Calaix 1 \u2014 Cargoleria M3/M4', items: [
+      { nom: 'Arandela M3',          tip: 'ARANDELA', din: 'DIN125M3',     met: '3', lon: ''   },
+      { nom: 'Arandela especial M3', tip: 'ARANDELA', din: 'DIN9021M3',    met: '3', lon: ''   },
+      { nom: 'Famella M3',           tip: 'TUERCA',   din: 'DIN934M3',     met: '3', lon: ''   },
+      { nom: 'Famella auto M3',      tip: 'TUERCA',   din: 'DIN985M3',     met: '3', lon: ''   },
+      { nom: 'Famella cega M3',      tip: 'TUERCA',   din: 'DIN1587M3',    met: '3', lon: ''   },
+      { nom: 'Grower M3',            tip: 'GROWER',   din: 'DIN127M3',     met: '3', lon: ''   },
+      { nom: 'Allen 3\u00d76',           tip: 'ALLEN',    din: 'DIN912M3x6',   met: '3', lon: '6'  },
+      { nom: 'Allen 3\u00d710',          tip: 'ALLEN',    din: 'DIN912M3x10',  met: '3', lon: '10' },
+      { nom: 'Allen 3\u00d716',          tip: 'ALLEN',    din: 'DIN912M3x16',  met: '3', lon: '16' },
+      { nom: 'Allen 3\u00d720',          tip: 'ALLEN',    din: 'DIN912M3x20',  met: '3', lon: '20' },
+      { nom: 'Allen con cuello 3\u00d740', tip: 'ALLEN',  din: 'DIN912M3x40',  met: '3', lon: '40' },
+      { nom: 'Allen con cuello 3\u00d760', tip: 'ALLEN',  din: 'DIN912M3x60',  met: '3', lon: '60' },
+      { nom: 'Vis 3\u00d76',            tip: 'VIS',      din: 'DIN7991M3x6',  met: '3', lon: '6'  },
+      { nom: 'Vis 3\u00d710',           tip: 'VIS',      din: 'DIN7991M3x10', met: '3', lon: '10' },
+      { nom: 'Vis 3\u00d716',           tip: 'VIS',      din: 'DIN7991M3x16', met: '3', lon: '16' },
+      { nom: 'Cap Rod\u00f3 3\u00d710',      tip: 'CAP ROD\u00d3', din: 'DIN7380M3x10', met: '3', lon: '10' },
+      { nom: 'SV 3\u00d710',            tip: 'SV',       din: 'DIN933M3x10',  met: '3', lon: '10' },
+      { nom: 'Arandela M4',          tip: 'ARANDELA', din: 'DIN125M4',     met: '4', lon: ''   },
+      { nom: 'Arandela especial M4', tip: 'ARANDELA', din: 'DIN9021M4',    met: '4', lon: ''   },
+      { nom: 'Famella M4',           tip: 'TUERCA',   din: 'DIN934M4',     met: '4', lon: ''   },
+      { nom: 'Famella auto M4',      tip: 'TUERCA',   din: 'DIN985M4',     met: '4', lon: ''   },
+      { nom: 'Famella cega M4',      tip: 'TUERCA',   din: 'DIN1587M4',    met: '4', lon: ''   },
+      { nom: 'Grower M4',            tip: 'GROWER',   din: 'DIN127M4',     met: '4', lon: ''   },
+      { nom: 'Allen 4\u00d76',           tip: 'ALLEN',    din: 'DIN912M4x6',   met: '4', lon: '6'  },
+      { nom: 'Allen 4\u00d710',          tip: 'ALLEN',    din: 'DIN912M4x10',  met: '4', lon: '10' },
+      { nom: 'Allen 4\u00d716',          tip: 'ALLEN',    din: 'DIN912M4x16',  met: '4', lon: '16' },
+      { nom: 'Allen 4\u00d720',          tip: 'ALLEN',    din: 'DIN912M4x20',  met: '4', lon: '20' },
+      { nom: 'Allen 4\u00d725',          tip: 'ALLEN',    din: 'DIN912M4x25',  met: '4', lon: '25' },
+      { nom: 'Allen con cuello 4\u00d740', tip: 'ALLEN',  din: 'DIN812M4x40',  met: '4', lon: '40' },
+      { nom: 'Vis 4\u00d76',            tip: 'VIS',      din: 'DIN7991M4x6',  met: '4', lon: '6'  },
+      { nom: 'Vis 4\u00d710',           tip: 'VIS',      din: 'DIN7991M4x10', met: '4', lon: '10' },
+      { nom: 'Vis 4\u00d716',           tip: 'VIS',      din: 'DIN7991M4x16', met: '4', lon: '16' },
+      { nom: 'Vis 4\u00d725',           tip: 'VIS',      din: 'DIN7991M4x25', met: '4', lon: '25' },
+      { nom: 'Cap Rod\u00f3 4\u00d76',      tip: 'CAP ROD\u00d3', din: 'DIN7380M4x6',  met: '4', lon: '6'  },
+      { nom: 'Cap Rod\u00f3 4\u00d710',     tip: 'CAP ROD\u00d3', din: 'DIN7380M4x10', met: '4', lon: '10' },
+      { nom: 'Cap Rod\u00f3 4\u00d716',     tip: 'CAP ROD\u00d3', din: 'DIN7380M4x16', met: '4', lon: '16' },
+      { nom: 'Cap Rod\u00f3 4\u00d720',     tip: 'CAP ROD\u00d3', din: 'DIN7380M4x20', met: '4', lon: '20' },
+      { nom: 'Cap Rod\u00f3 4\u00d740',     tip: 'CAP ROD\u00d3', din: 'DIN7380M4x40', met: '4', lon: '40' },
+      { nom: 'SV 4\u00d76',             tip: 'SV',       din: 'DIN933M4x6',   met: '4', lon: '6'  },
+      { nom: 'SV 4\u00d710',            tip: 'SV',       din: 'DIN933M4x10',  met: '4', lon: '10' },
+      { nom: 'SV 4\u00d716',            tip: 'SV',       din: 'DIN933M4x16',  met: '4', lon: '16' },
+      { nom: 'SV 4\u00d720',            tip: 'SV',       din: 'DIN933M4x20',  met: '4', lon: '20' },
+      { nom: 'SV 4\u00d725',            tip: 'SV',       din: 'DIN933M4x25',  met: '4', lon: '25' },
+      { nom: 'SV 4\u00d730',            tip: 'SV',       din: 'DIN933M4x30',  met: '4', lon: '30' },
+      { nom: 'Esparrec 4\u00d76',       tip: 'ESPARREC', din: 'DIN916M4x6',   met: '4', lon: '6'  },
+      { nom: 'Esparrec 4\u00d710',      tip: 'ESPARREC', din: 'DIN916M4x10',  met: '4', lon: '10' },
+    ]},
+    { grup: 'Calaix 2 \u2014 Cargoleria M5', items: [
+      { nom: 'Arandela M5',          tip: 'ARANDELA', din: 'DIN125M5',      met: '5', lon: ''   },
+      { nom: 'Arandela especial M5', tip: 'ARANDELA', din: 'DIN9021M5',     met: '5', lon: ''   },
+      { nom: 'Famella M5',           tip: 'TUERCA',   din: 'DIN934M5',      met: '5', lon: ''   },
+      { nom: 'Famella auto M5',      tip: 'TUERCA',   din: 'DIN985M5',      met: '5', lon: ''   },
+      { nom: 'Famella cega M5',      tip: 'TUERCA',   din: 'DIN1587M5',     met: '5', lon: ''   },
+      { nom: 'Grower M5',            tip: 'GROWER',   din: 'DIN127M5',      met: '5', lon: ''   },
+      { nom: 'Allen 5\u00d76',           tip: 'ALLEN',    din: 'DIN912M5x6',    met: '5', lon: '6'  },
+      { nom: 'Allen 5\u00d710',          tip: 'ALLEN',    din: 'DIN912M5x10',   met: '5', lon: '10' },
+      { nom: 'Allen 5\u00d716',          tip: 'ALLEN',    din: 'DIN912M5x16',   met: '5', lon: '16' },
+      { nom: 'Allen 5\u00d720',          tip: 'ALLEN',    din: 'DIN912M5x20',   met: '5', lon: '20' },
+      { nom: 'Allen 5\u00d725',          tip: 'ALLEN',    din: 'DIN912M5x25',   met: '5', lon: '25' },
+      { nom: 'Allen 5\u00d730',          tip: 'ALLEN',    din: 'DIN912M5x30',   met: '5', lon: '30' },
+      { nom: 'Allen 5\u00d735',          tip: 'ALLEN',    din: 'DIN912M5x35',   met: '5', lon: '35' },
+      { nom: 'Allen 5\u00d750',          tip: 'ALLEN',    din: 'DIN812M5x50',   met: '5', lon: '50' },
+      { nom: 'Vis 5\u00d710',           tip: 'VIS',      din: 'DIN7991M5x10',  met: '5', lon: '10' },
+      { nom: 'Vis 5\u00d716',           tip: 'VIS',      din: 'DIN7991M5x16',  met: '5', lon: '16' },
+      { nom: 'Vis 5\u00d720',           tip: 'VIS',      din: 'DIN7991M5x20',  met: '5', lon: '20' },
+      { nom: 'Vis 5\u00d725',           tip: 'VIS',      din: 'DIN7991M5x25',  met: '5', lon: '25' },
+      { nom: 'Vis 5\u00d750',           tip: 'VIS',      din: 'DIN7991M5x50',  met: '5', lon: '50' },
+      { nom: 'Cap Rod\u00f3 5\u00d76',      tip: 'CAP ROD\u00d3', din: 'DIN7380M5x6',   met: '5', lon: '6'  },
+      { nom: 'Cap Rod\u00f3 5\u00d710',     tip: 'CAP ROD\u00d3', din: 'DIN7380M5x10',  met: '5', lon: '10' },
+      { nom: 'Cap Rod\u00f3 5\u00d716',     tip: 'CAP ROD\u00d3', din: 'DIN7380M5x16',  met: '5', lon: '16' },
+      { nom: 'Cap Rod\u00f3 5\u00d720',     tip: 'CAP ROD\u00d3', din: 'DIN7380M5x20',  met: '5', lon: '20' },
+      { nom: 'Cap Rod\u00f3 5\u00d740',     tip: 'CAP ROD\u00d3', din: 'DIN7380M5x40',  met: '5', lon: '40' },
+      { nom: 'SV 5\u00d76',             tip: 'SV',       din: 'DIN933M5x6',    met: '5', lon: '6'  },
+      { nom: 'SV 5\u00d710',            tip: 'SV',       din: 'DIN933M5x10',   met: '5', lon: '10' },
+      { nom: 'SV 5\u00d716',            tip: 'SV',       din: 'DIN933M5x16',   met: '5', lon: '16' },
+      { nom: 'SV 5\u00d720',            tip: 'SV',       din: 'DIN933M5x20',   met: '5', lon: '20' },
+      { nom: 'SV 5\u00d735',            tip: 'SV',       din: 'DIN933M5x35',   met: '5', lon: '35' },
+      { nom: 'SV 5\u00d750',            tip: 'SV',       din: 'DIN933M5x50',   met: '5', lon: '50' },
+      { nom: 'Esparrec 5\u00d76',       tip: 'ESPARREC', din: 'DIN916M5x6',    met: '5', lon: '6'  },
+      { nom: 'Esparrec 5\u00d710',      tip: 'ESPARREC', din: 'DIN916M5x10',   met: '5', lon: '10' },
+    ]},
+    { grup: 'Calaix 3 \u2014 Cargoleria M6', items: [
+      { nom: 'Arandela M6',          tip: 'ARANDELA', din: 'DIN125M6',      met: '6', lon: ''   },
+      { nom: 'Arandela especial M6', tip: 'ARANDELA', din: 'DIN9021M6',     met: '6', lon: ''   },
+      { nom: 'Famella M6',           tip: 'TUERCA',   din: 'DIN934M6',      met: '6', lon: ''   },
+      { nom: 'Grower M6',            tip: 'GROWER',   din: 'DIN127M6',      met: '6', lon: ''   },
+      { nom: 'Famella auto M6',      tip: 'TUERCA',   din: 'DIN985M6',      met: '6', lon: ''   },
+      { nom: 'Famella cega M6',      tip: 'TUERCA',   din: 'DIN1587M6',     met: '6', lon: ''   },
+      { nom: 'Allen 6\u00d76',           tip: 'ALLEN',    din: 'DIN912M6x6',    met: '6', lon: '6'  },
+      { nom: 'Allen 6\u00d710',          tip: 'ALLEN',    din: 'DIN912M6x10',   met: '6', lon: '10' },
+      { nom: 'Allen 6\u00d716',          tip: 'ALLEN',    din: 'DIN912M6x16',   met: '6', lon: '16' },
+      { nom: 'Allen 6\u00d725',          tip: 'ALLEN',    din: 'DIN912M6x25',   met: '6', lon: '25' },
+      { nom: 'Vis 6\u00d710',           tip: 'VIS',      din: 'DIN7991M6x10',  met: '6', lon: '10' },
+      { nom: 'Vis 6\u00d712',           tip: 'VIS',      din: 'DIN7991M6x12',  met: '6', lon: '12' },
+      { nom: 'Vis 6\u00d716',           tip: 'VIS',      din: 'DIN7991M6x16',  met: '6', lon: '16' },
+      { nom: 'Vis 6\u00d720',           tip: 'VIS',      din: 'DIN7991M6x20',  met: '6', lon: '20' },
+      { nom: 'Vis 6\u00d745',           tip: 'VIS',      din: 'DIN7991M6x45',  met: '6', lon: '45' },
+      { nom: 'Cap Rod\u00f3 6\u00d76',      tip: 'CAP ROD\u00d3', din: 'DIN7380M6x6',   met: '6', lon: '6'  },
+      { nom: 'Cap Rod\u00f3 6\u00d710',     tip: 'CAP ROD\u00d3', din: 'DIN7380M6x10',  met: '6', lon: '10' },
+      { nom: 'Cap Rod\u00f3 6\u00d716',     tip: 'CAP ROD\u00d3', din: 'DIN7380M6x16',  met: '6', lon: '16' },
+      { nom: 'Cap Rod\u00f3 6\u00d720',     tip: 'CAP ROD\u00d3', din: 'DIN7380M6x20',  met: '6', lon: '20' },
+      { nom: 'Cap Rod\u00f3 6\u00d740',     tip: 'CAP ROD\u00d3', din: 'DIN7380M6x40',  met: '6', lon: '40' },
+      { nom: 'Carro 6\u00d716',         tip: 'DE CARRO', din: 'DIN603M6x16',   met: '6', lon: '16' },
+      { nom: 'Carro 6\u00d720',         tip: 'DE CARRO', din: 'DIN603M6x20',   met: '6', lon: '20' },
+      { nom: 'Carro 6\u00d725',         tip: 'DE CARRO', din: 'DIN603M6x25',   met: '6', lon: '25' },
+      { nom: 'SV 6\u00d710',            tip: 'SV',       din: 'DIN933M6x10',   met: '6', lon: '10' },
+      { nom: 'SV 6\u00d712',            tip: 'SV',       din: 'DIN933M6x12',   met: '6', lon: '12' },
+      { nom: 'SV 6\u00d716',            tip: 'SV',       din: 'DIN933M6x16',   met: '6', lon: '16' },
+      { nom: 'SV 6\u00d720',            tip: 'SV',       din: 'DIN933M6x20',   met: '6', lon: '20' },
+      { nom: 'SV 6\u00d725',            tip: 'SV',       din: 'DIN933M6x25',   met: '6', lon: '25' },
+      { nom: 'SV 6\u00d740',            tip: 'SV',       din: 'DIN933M6x40',   met: '6', lon: '40' },
+      { nom: 'Esparrec 6\u00d76',       tip: 'ESPARREC', din: 'DIN916M6x6',    met: '6', lon: '6'  },
+      { nom: 'Esparrec 6\u00d725',      tip: 'ESPARREC', din: 'DIN916M6x25',   met: '6', lon: '25' },
+    ]},
+    { grup: 'Calaix 4 \u2014 Cargoleria M8', items: [
+      { nom: 'Arandela M8',          tip: 'ARANDELA', din: 'DIN125M8',      met: '8', lon: ''   },
+      { nom: 'Arandela especial M8', tip: 'ARANDELA', din: 'DIN9021M8',     met: '8', lon: ''   },
+      { nom: 'Famella M8',           tip: 'TUERCA',   din: 'DIN934M8',      met: '8', lon: ''   },
+      { nom: 'Grower M8',            tip: 'GROWER',   din: 'DIN127M8',      met: '8', lon: ''   },
+      { nom: 'Famella auto M8',      tip: 'TUERCA',   din: 'DIN985M8',      met: '8', lon: ''   },
+      { nom: 'Famella cega M8',      tip: 'TUERCA',   din: 'DIN1587M8',     met: '8', lon: ''   },
+      { nom: 'Pulit 8\u00d710',          tip: 'PULIT',    din: '119512',       met: '8', lon: '10' },
+      { nom: 'Pulit 8\u00d716',          tip: 'PULIT',    din: '117876',       met: '8', lon: '16' },
+      { nom: 'Pulit 8\u00d720',          tip: 'PULIT',    din: '119511',       met: '8', lon: '20' },
+      { nom: 'Pulit 8\u00d725',          tip: 'PULIT',    din: '117877',       met: '8', lon: '25' },
+      { nom: 'Pulit 8\u00d745',          tip: 'PULIT',    din: '117895',       met: '8', lon: '45' },
+      { nom: 'Pulit 8\u00d750',          tip: 'PULIT',    din: '119514',       met: '8', lon: '50' },
+      { nom: 'SV 8\u00d710',            tip: 'SV',       din: 'DIN933M8x10',  met: '8', lon: '10' },
+      { nom: 'SV 8\u00d716',            tip: 'SV',       din: 'DIN933M8x16',  met: '8', lon: '16' },
+      { nom: 'SV 8\u00d720',            tip: 'SV',       din: 'DIN933M8x20',  met: '8', lon: '20' },
+      { nom: 'SV 8\u00d725',            tip: 'SV',       din: 'DIN933M8x25',  met: '8', lon: '25' },
+      { nom: 'SV 8\u00d735',            tip: 'SV',       din: 'DIN933M8x35',  met: '8', lon: '35' },
+      { nom: 'SV 8\u00d770',            tip: 'SV',       din: 'DIN933M8x70',  met: '8', lon: '70' },
+      { nom: 'SV 8\u00d7100',           tip: 'SV',       din: 'DIN933M8x100', met: '8', lon: '100'},
+      { nom: 'Esparrec 8\u00d76',       tip: 'ESPARREC', din: 'DIN916M8x6',   met: '8', lon: '6'  },
+      { nom: 'Esparrec 8\u00d716',      tip: 'ESPARREC', din: 'DIN916M8x16',  met: '8', lon: '16' },
+      { nom: 'Allen 8\u00d710',          tip: 'ALLEN',    din: 'DIN912M8x10',  met: '8', lon: '10' },
+      { nom: 'Allen 8\u00d716',          tip: 'ALLEN',    din: 'DIN912M8x16',  met: '8', lon: '16' },
+      { nom: 'Allen 8\u00d720',          tip: 'ALLEN',    din: 'DIN912M8x20',  met: '8', lon: '20' },
+      { nom: 'Allen 8\u00d740',          tip: 'ALLEN',    din: 'DIN912M8x40',  met: '8', lon: '40' },
+      { nom: 'Allen 8\u00d760',          tip: 'ALLEN',    din: 'DIN912M8x60',  met: '8', lon: '60' },
+      { nom: 'Vis 8\u00d710',           tip: 'VIS',      din: 'DIN7991M8x10', met: '8', lon: '10' },
+      { nom: 'Vis 8\u00d712',           tip: 'VIS',      din: 'DIN7991M8x12', met: '8', lon: '12' },
+      { nom: 'Vis 8\u00d716',           tip: 'VIS',      din: 'DIN7991M8x16', met: '8', lon: '16' },
+      { nom: 'Vis 8\u00d720',           tip: 'VIS',      din: 'DIN7991M8x20', met: '8', lon: '20' },
+      { nom: 'Vis 8\u00d740',           tip: 'VIS',      din: 'DIN7991M8x40', met: '8', lon: '40' },
+      { nom: 'Cap rod\u00f3 8\u00d710',     tip: 'CAP ROD\u00d3', din: 'DIN7380M8x10', met: '8', lon: '10' },
+      { nom: 'Cap rod\u00f3 8\u00d716',     tip: 'CAP ROD\u00d3', din: 'DIN7380M8x16', met: '8', lon: '16' },
+      { nom: 'Cap rod\u00f3 8\u00d720',     tip: 'CAP ROD\u00d3', din: 'DIN7380M8x20', met: '8', lon: '20' },
+      { nom: 'Cap rod\u00f3 8\u00d740',     tip: 'CAP ROD\u00d3', din: 'DIN7380M8x40', met: '8', lon: '40' },
+      { nom: 'Cap rod\u00f3 8\u00d760',     tip: 'CAP ROD\u00d3', din: 'DIN7380M8x60', met: '8', lon: '60' },
+      { nom: 'Carro 8\u00d716',         tip: 'DE CARRO', din: 'DIN603M8x16',  met: '8', lon: '16' },
+      { nom: 'Carro 8\u00d720',         tip: 'DE CARRO', din: 'DIN603M8x20',  met: '8', lon: '20' },
+      { nom: 'Carro 8\u00d725',         tip: 'DE CARRO', din: 'DIN603M8x25',  met: '8', lon: '25' },
+      { nom: 'Carro 8\u00d735',         tip: 'DE CARRO', din: 'DIN603M8x35',  met: '8', lon: '35' },
+    ]},
+    { grup: 'Calaix 5 \u2014 Cargoleria M10', items: [
+      { nom: 'Arandela M10',          tip: 'ARANDELA', din: 'DIN125M10',     met: '10', lon: ''   },
+      { nom: 'Arandela especial M10', tip: 'ARANDELA', din: 'DIN9021M10',    met: '10', lon: ''   },
+      { nom: 'Famella M10',           tip: 'TUERCA',   din: 'DIN934M10',     met: '10', lon: ''   },
+      { nom: 'Grower M10',            tip: 'GROWER',   din: 'DIN127M10',     met: '10', lon: ''   },
+      { nom: 'Famella auto M10',      tip: 'TUERCA',   din: 'DIN985M10',     met: '10', lon: ''   },
+      { nom: 'Famella cega M10',      tip: 'TUERCA',   din: 'DIN1587M10',    met: '10', lon: ''   },
+      { nom: 'Pulit 10\u00d712',         tip: 'PULIT',    din: '',             met: '10', lon: '12' },
+      { nom: 'Pulit 10\u00d716',         tip: 'PULIT',    din: '',             met: '10', lon: '16' },
+      { nom: 'Pulit 10\u00d720',         tip: 'PULIT',    din: '',             met: '10', lon: '20' },
+      { nom: 'Pulit 10\u00d725',         tip: 'PULIT',    din: '',             met: '10', lon: '25' },
+      { nom: 'Pulit 10\u00d735',         tip: 'PULIT',    din: '',             met: '10', lon: '35' },
+      { nom: 'Pulit 10\u00d740',         tip: 'PULIT',    din: '117873',       met: '10', lon: '40' },
+      { nom: 'Pulit 10\u00d750',         tip: 'PULIT',    din: '117875',       met: '10', lon: '50' },
+      { nom: 'Pulit 10\u00d760',         tip: 'PULIT',    din: '',             met: '10', lon: '60' },
+      { nom: 'SV 10\u00d710',           tip: 'SV',       din: 'DIN933M10x10', met: '10', lon: '10' },
+      { nom: 'SV 10\u00d716',           tip: 'SV',       din: 'DIN933M10x16', met: '10', lon: '16' },
+      { nom: 'SV 10\u00d720',           tip: 'SV',       din: 'DIN933M10x20', met: '10', lon: '20' },
+      { nom: 'SV 10\u00d730',           tip: 'SV',       din: 'DIN933M10x30', met: '10', lon: '30' },
+      { nom: 'SV 10\u00d735',           tip: 'SV',       din: 'DIN933M10x35', met: '10', lon: '35' },
+      { nom: 'SV 10\u00d740',           tip: 'SV',       din: 'DIN933M10x40', met: '10', lon: '40' },
+      { nom: 'Esparrec 10\u00d716',     tip: 'ESPARREC', din: 'DIN916M10x16', met: '10', lon: '16' },
+      { nom: 'Esparrec 10\u00d725',     tip: 'ESPARREC', din: 'DIN916M10x25', met: '10', lon: '25' },
+      { nom: 'Allen 10\u00d712',         tip: 'ALLEN',    din: 'DIN912M10x12', met: '10', lon: '12' },
+      { nom: 'Allen 10\u00d716',         tip: 'ALLEN',    din: 'DIN912M10x16', met: '10', lon: '16' },
+      { nom: 'Allen 10\u00d720',         tip: 'ALLEN',    din: 'DIN912M10x20', met: '10', lon: '20' },
+      { nom: 'Allen 10\u00d725',         tip: 'ALLEN',    din: 'DIN912M10x25', met: '10', lon: '25' },
+      { nom: 'Allen 10\u00d760',         tip: 'ALLEN',    din: 'DIN912M10x60', met: '10', lon: '60' },
+      { nom: 'Vis 10\u00d712',          tip: 'VIS',      din: 'DIN7991M10x12',met: '10', lon: '12' },
+      { nom: 'Vis 10\u00d716',          tip: 'VIS',      din: 'DIN7991M10x16',met: '10', lon: '16' },
+      { nom: 'Vis 10\u00d720',          tip: 'VIS',      din: 'DIN7991M10x20',met: '10', lon: '20' },
+      { nom: 'Vis 10\u00d725',          tip: 'VIS',      din: 'DIN7991M10x25',met: '10', lon: '25' },
+      { nom: 'Vis 10\u00d760',          tip: 'VIS',      din: 'DIN7991M10x60',met: '10', lon: '60' },
+      { nom: 'Cap Rod\u00f3 10\u00d712',    tip: 'CAP ROD\u00d3', din: 'DIN7380M10x12',met: '10', lon: '12' },
+      { nom: 'Cap Rod\u00f3 10\u00d716',    tip: 'CAP ROD\u00d3', din: 'DIN7380M10x16',met: '10', lon: '16' },
+      { nom: 'Cap Rod\u00f3 10\u00d720',    tip: 'CAP ROD\u00d3', din: 'DIN7380M10x20',met: '10', lon: '20' },
+      { nom: 'Cap Rod\u00f3 10\u00d725',    tip: 'CAP ROD\u00d3', din: 'DIN7380M10x25',met: '10', lon: '25' },
+      { nom: 'Cap Rod\u00f3 10\u00d760',    tip: 'CAP ROD\u00d3', din: 'DIN7380M10x60',met: '10', lon: '60' },
+      { nom: 'Carro 10\u00d716',        tip: 'DE CARRO', din: 'DIN603M10x16', met: '10', lon: '16' },
+      { nom: 'Carro 10\u00d720',        tip: 'DE CARRO', din: 'DIN603M10x20', met: '10', lon: '20' },
+      { nom: 'Carro 10\u00d725',        tip: 'DE CARRO', din: 'DIN603M10x25', met: '10', lon: '25' },
+      { nom: 'Carro 10\u00d730',        tip: 'DE CARRO', din: 'DIN603M10x30', met: '10', lon: '30' },
+    ]},
+    { grup: 'Calaix 6 \u2014 Cargoleria M12', items: [
+      { nom: 'Arandela M12',          tip: 'ARANDELA', din: 'DIN125M12',     met: '12', lon: ''   },
+      { nom: 'Arandela especial M12', tip: 'ARANDELA', din: 'DIN9021M12',    met: '12', lon: ''   },
+      { nom: 'Famella M12',           tip: 'TUERCA',   din: 'DIN934M12',     met: '12', lon: ''   },
+      { nom: 'Grower M12',            tip: 'GROWER',   din: 'DIN127M12',     met: '12', lon: ''   },
+      { nom: 'Famella auto M12',      tip: 'TUERCA',   din: 'DIN985M12',     met: '12', lon: ''   },
+      { nom: 'Famella cega M12',      tip: 'TUERCA',   din: 'DIN1587M12',    met: '12', lon: ''   },
+      { nom: 'Allen 12\u00d730',         tip: 'ALLEN',    din: 'DIN912M12x30', met: '12', lon: '30' },
+      { nom: 'Allen 12\u00d740',         tip: 'ALLEN',    din: 'DIN912M12x40', met: '12', lon: '40' },
+      { nom: 'Allen 12\u00d760',         tip: 'ALLEN',    din: 'DIN912M12x60', met: '12', lon: '60' },
+      { nom: 'Allen 12\u00d770',         tip: 'ALLEN',    din: 'DIN912M12x70', met: '12', lon: '70' },
+      { nom: 'Vis 12\u00d720',          tip: 'VIS',      din: 'DIN7991M12x20',met: '12', lon: '20' },
+      { nom: 'Cap Rod\u00f3 12\u00d750',    tip: 'CAP ROD\u00d3', din: 'DIN7380M12x50',met: '12', lon: '50' },
+      { nom: 'SV 12\u00d716',           tip: 'SV',       din: 'DIN933M12x16', met: '12', lon: '16' },
+      { nom: 'SV 12\u00d720',           tip: 'SV',       din: 'DIN933M12x20', met: '12', lon: '20' },
+      { nom: 'SV 12\u00d730',           tip: 'SV',       din: 'DIN933M12x30', met: '12', lon: '30' },
+      { nom: 'SV 12\u00d740',           tip: 'SV',       din: 'DIN933M12x40', met: '12', lon: '40' },
+      { nom: 'SV 12\u00d745',           tip: 'SV',       din: 'DIN933M12x45', met: '12', lon: '45' },
+      { nom: 'SV 12\u00d770',           tip: 'SV',       din: 'DIN933M12x70', met: '12', lon: '70' },
+      { nom: 'SV 12\u00d790',           tip: 'SV',       din: 'DIN933M12x90', met: '12', lon: '90' },
+      { nom: 'SV 12\u00d7100',          tip: 'SV',       din: 'DIN933M12x100',met: '12', lon: '100'},
+      { nom: 'SV 12\u00d7120',          tip: 'SV',       din: 'DIN933M12x120',met: '12', lon: '120'},
+    ]},
+  ],
+};
+
+
+const TREBALLADORS = [
+  // Elèctrics MXP
+  { num: '1238',     nom: 'Mahamadou Jamegay',        seccio: 'Elèctrics MXP' },
+  { num: '1239',     nom: 'Marouane Hajam',            seccio: 'Elèctrics MXP' },
+  { num: '1240',     nom: 'Hamza Slimani',             seccio: 'Elèctrics MXP' },
+  { num: '1241',     nom: 'Alahaji Saikou',            seccio: 'Elèctrics MXP' },
+  { num: '1242',     nom: 'Axel Lara',                 seccio: 'Elèctrics MXP' },
+  { num: '1243',     nom: 'Arvinder',                  seccio: 'Elèctrics MXP' },
+  { num: '1244',     nom: 'Dario Palacios',            seccio: 'Elèctrics MXP' },
+  { num: '1245',     nom: 'Marc Codony',               seccio: 'Elèctrics MXP' },
+  { num: '1246',     nom: 'Bakary Singateh',           seccio: 'Elèctrics MXP' },
+  { num: '1247',     nom: 'Kilian Pedro',              seccio: 'Elèctrics MXP' },
+  { num: '1286',     nom: 'Nil Juanola',               seccio: 'Elèctrics MXP' },
+  { num: '570',      nom: 'Albert Busquets',           seccio: 'Elèctrics MXP' },
+  { num: '90001741', nom: 'Mahamadou Touray Gumaneh',  seccio: 'Elèctrics MXP' },
+  { num: '90001930', nom: 'Olek Prykhodko',            seccio: 'Elèctrics MXP' },
+  // Paletització
+  { num: '250',      nom: 'Jordi',                     seccio: 'Paletització' },
+  { num: '623',      nom: 'Touray',                    seccio: 'Paletització' },
+  { num: '1025',     nom: 'Marin',                     seccio: 'Paletització' },
+  // Intralox
+  { num: '822',      nom: 'Victor Plamadeala',         seccio: 'Intralox'      },
+  { num: '897',      nom: 'Mateo Castro',              seccio: 'Intralox'      },
+  { num: '597',      nom: 'Brahim',                    seccio: 'Intralox'      },
+  { num: '90001943', nom: 'Igor',                      seccio: 'Intralox'      },
+  // Intralox P9
+  { num: '90001827', nom: 'Mario Danza',               seccio: 'Intralox P9'   },
+  { num: '901',      nom: 'Soufian',                   seccio: 'Intralox P9'   },
+  // Rodets
+  { num: '472',      nom: 'Victor de la Cruz',         seccio: 'Rodets'        },
+  { num: '90002044', nom: 'Hardeep',                   seccio: 'Rodets'        },
+  // Rodets P8
+  { num: '90001840', nom: 'Bogdan',                    seccio: 'Rodets P8'     },
+  // Corbes
+  { num: '90001932', nom: 'Amara',                     seccio: 'Corbes'        },
+];
+let currentSeccio = null;
+let draft = [];
+let cargFilter = 'all';
+let addMode = 'cataleg';
+let mxpSubseccio = null;
+let mxpCalaix = null;
+let responsableNum = localStorage.getItem('carg_responsable_num') || '';
+function getResponsableNom() {
+  const t = TREBALLADORS.find(t => t.num === responsableNum);
+  return t ? t.nom : responsableNum;
+}
+function getResponsableSeccio() {
+  const t = TREBALLADORS.find(t => t.num === responsableNum);
+  return t ? t.seccio : null; // null = accés total (cargoleria)
+}
+let peticions = [];
+try { peticions = JSON.parse(localStorage.getItem('carg_v3') || '[]'); } catch(e) {}
+
+function save() { try { localStorage.setItem('carg_v3', JSON.stringify(peticions)); } catch(e) {} }
+
+function getWeekKey(off = 0) {
+  const d = new Date(); d.setDate(d.getDate() - off * 7);
+  const s = new Date(d.getFullYear(), 0, 1);
+  const w = Math.ceil(((d - s) / 86400000 + s.getDay() + 1) / 7);
+  return `S${String(w).padStart(2,'0')}-${d.getFullYear()}`;
+}
+const curWeek = getWeekKey(0);
+
+function weekLabel(k) {
+  const [w, y] = k.replace('S','').split('-');
+  return `S${parseInt(w)} — ${y}`;
+}
+function weekAge(k) {
+  const [cw, cy] = curWeek.replace('S','').split('-').map(Number);
+  const [w, y] = k.replace('S','').split('-').map(Number);
+  return (cy - y) * 52 + (cw - w);
+}
+
+document.getElementById('wk-label').textContent = weekLabel(curWeek);
+
+// Demo data
+if (!peticions.length) {
+  const w1 = getWeekKey(2), w2 = getWeekKey(1);
+  peticions = [
+    {id:'d1', seccio:'Intralox', ref:'CAP POLIT M10×16', loc:'Eix costelles', qty:4, estat:'Sense estoc', week:w1, ts:'28/04/2025'},
+    {id:'d2', seccio:'Intralox', ref:'SISAWAT M6×25', loc:'Plàstic costelles', qty:3, estat:'Sense estoc', week:w2, ts:'05/05/2025'},
+    {id:'d3', seccio:'Handling', ref:'CAP POLIT M8×50', loc:'Suport lateral', qty:2, estat:'Sense estoc', week:w2, ts:'05/05/2025'},
+    {id:'d4', seccio:'Rodets', ref:'SISAWAT M8×30', loc:'Plàstic superior', qty:6, estat:'Entregat', week:w1, ts:'28/04/2025'},
+  ];
+  save();
+}
+
+function pendingFor(sec) {
+  return peticions.filter(p => p.seccio === sec && p.estat === 'Sense estoc');
+}
+
+function setView(v) {
+  currentView = v;
+  document.querySelectorAll('.vtbtn').forEach((b,i) => b.classList.toggle('active', (v==='peticio'&&i===0)||(v==='cargoleria'&&i===1)));
+  render();
+}
+
+function render() {
+  const el = document.getElementById('main-content');
+  if (currentView === 'peticio') {
+    if (!currentSeccio) {
+      el.innerHTML = renderSeccioSelect();
+    } else if (currentSeccio === 'Elèctrics MXP') {
+      if (!mxpSubseccio)       el.innerHTML = renderMxpSubseccio();
+      else if (!mxpCalaix)     el.innerHTML = renderMxpCalaixos();
+      else                     el.innerHTML = renderMxpCalaix();
+    } else {
+      el.innerHTML = renderPeticio();
+    }
+  } else {
+    el.innerHTML = renderCargoleria();
+    document.querySelectorAll('.carf-btn').forEach(b => {
+      b.addEventListener('click', () => setCarFilter(b.dataset.f));
+    });
+  }
+}
+
+/* ---- SECCIÓ SELECT ---- */
+function renderSeccioSelect() {
+  const treballador = TREBALLADORS.find(t => t.num === responsableNum);
+  const seccioRestringida = treballador ? treballador.seccio : null;
+
+  const cards = (seccioRestringida ? [seccioRestringida] : SECCIONS).map(s => {
+    const pend = pendingFor(s);
+    const qty = pend.reduce((a,p) => a+p.qty, 0);
+    return `<div class="sec-card ${qty>0?'has-pending':''}" onclick="selectSeccio('${s}')">
+      ${qty>0 ? '<div class="sec-dot"></div>' : ''}
+      <div class="sec-card-name">${s}</div>
+      <div class="sec-card-sub">${qty>0 ? `${qty} ut. sense estoc` : 'Sense pendents'}</div>
+    </div>`;
+  }).join('');
+
+  if (!responsableNum) {
+    return `
+    <div style="max-width:380px;margin:20px auto 0">
+      <div class="card">
+        <div class="card-head"><span class="card-title">Identificació</span></div>
+        <div class="card-body">
+          <div class="field">
+            <label>Número de treballador</label>
+            <input type="number" id="inp-num" placeholder="ex: 1245" autofocus
+              style="font-size:20px;text-align:center;padding:12px;letter-spacing:4px"
+              oninput="checkNum(this.value)">
+          </div>
+          <div id="num-feedback" style="font-size:13px;color:var(--text3);text-align:center;margin-top:4px">Introdueix el teu número</div>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  return `
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+    <div>
+      <div style="font-size:16px;font-weight:500;color:var(--text)">Hola, ${treballador ? treballador.nom : ''}!</div>
+      <div style="font-size:12px;color:var(--text3)">#${responsableNum} — ${seccioRestringida ? 'accés ' + seccioRestringida : 'accés totes les seccions'}</div>
+    </div>
+    <button class="btn-sec" onclick="responsableNum='';localStorage.removeItem('carg_responsable_num');render()">Canviar</button>
+  </div>
+  <div class="screen-label">Selecciona la teva secció</div>
+  <div class="section-grid">${cards}</div>`;
+}
+
+function selectSeccio(s) { currentSeccio = s; draft = []; mxpSubseccio = null; mxpCalaix = null; render(); }
+
+/* ---- MXP: PAS 1 — triar subsecció ---- */
+function renderMxpSubseccio() {
+  const pneumGrups = CATALEG['Elèctrics MXP'].filter(g => g.grup.toLowerCase().includes('pneum') || g.grup.toLowerCase().includes('punter') || g.grup.toLowerCase().includes('retr'));
+  const cargGrups  = CATALEG['Elèctrics MXP'].filter(g => g.grup.toLowerCase().includes('cargoleria'));
+
+  const pend = pendingFor('Elèctrics MXP');
+  const pendQty = pend.reduce((a,p) => a+p.qty, 0);
+
+  const banner = pendQty > 0 ? `
+  <div class="banner" style="margin-bottom:16px">
+    <div class="banner-dot"></div>
+    <div>
+      <strong>${pendQty} unitat${pendQty>1?'s':''} sense estoc</strong> de setmanes anteriors — cargoleria no ha pogut entregar-les. S'entregaran quan hi hagi estoc.
+      <div style="margin-top:10px;display:flex;flex-direction:column;gap:4px">
+        ${pend.map(p => {
+          const age = weekAge(p.week);
+          return `<div style="display:flex;align-items:center;justify-content:space-between;background:rgba(245,166,35,0.08);border:0.5px solid rgba(245,166,35,0.2);border-radius:7px;padding:7px 10px">
+            <div>
+              <span style="font-family:var(--font-code);font-size:12px;color:var(--text)">${p.ref}</span>
+              ${p.loc ? `<span style="font-size:11px;color:var(--text3);margin-left:8px">${p.loc}</span>` : ''}
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span class="week-tag ${age>=2?'old':'recent'}">${weekLabel(p.week)}</span>
+              <span style="font-family:var(--font-code);font-weight:600;font-size:13px;color:var(--warn)">${p.qty} ut.</span>
+            </div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+  </div>` : '';
+
+  return `
+  <div class="back-row">
+    <button class="back-btn" onclick="currentSeccio=null;render()">← Seccions</button>
+    <span class="page-title">Elèctrics MXP</span>
+  </div>
+  ${banner}
+  <div class="screen-label">Pas 1 — Tria la família</div>
+  <div class="section-grid" style="grid-template-columns:1fr 1fr;gap:12px;max-width:500px">
+    <div class="sec-card" onclick="mxpSubseccio='pneumatica';render()" style="padding:20px">
+      <div style="font-size:22px;margin-bottom:8px">🔵</div>
+      <div class="sec-card-name" style="font-size:15px">Pneumàtica</div>
+      <div class="sec-card-sub">${pneumGrups.length} calaixos</div>
+    </div>
+    <div class="sec-card" onclick="mxpSubseccio='cargoleria';render()" style="padding:20px">
+      <div style="font-size:22px;margin-bottom:8px">🔩</div>
+      <div class="sec-card-name" style="font-size:15px">Cargoleria</div>
+      <div class="sec-card-sub">${cargGrups.length} calaixos</div>
+    </div>
+  </div>
+  ${renderDraftCard()}`;
+}
+
+/* ---- MXP: PAS 2 — triar calaix ---- */
+function renderMxpCalaixos() {
+  const isPneum = mxpSubseccio === 'pneumatica';
+  const grups = CATALEG['Elèctrics MXP'].filter(g => {
+    const n = g.grup.toLowerCase();
+    if (isPneum) return n.includes('pneum') || n.includes('punter') || n.includes('retr');
+    return n.includes('cargoleria');
+  });
+  const cards = grups.map(g => {
+    const num = g.items.length;
+    return `<div class="sec-card" onclick="mxpCalaix=${JSON.stringify(g.grup).replace(/"/g,'&quot;')};render()">
+      <div class="sec-card-name" style="font-size:13px">${g.grup.replace(/Calaix \d+ — /,'')}</div>
+      <div class="sec-card-sub">${num} refer${num===1?'ència':'ències'}</div>
+    </div>`;
+  }).join('');
+  return `
+  <div class="back-row">
+    <button class="back-btn" onclick="mxpSubseccio=null;render()">← Família</button>
+    <span class="page-title">${isPneum ? 'Pneumàtica' : 'Cargoleria'}</span>
+  </div>
+  <div class="screen-label">Pas 2 — Tria el calaix</div>
+  <div class="section-grid">${cards}</div>
+  ${renderDraftCard()}`;
+}
+
+/* ---- MXP: PAS 3 — llista del calaix ---- */
+function renderMxpCalaix() {
+  const grup = CATALEG['Elèctrics MXP'].find(g => g.grup === mxpCalaix);
+  if (!grup) return '';
+  const rows = grup.items.map(item => {
+    const ref = `${item.tip ? item.tip+' ' : ''}${item.met?'M'+item.met:''}${item.lon?'×'+item.lon:''}`.trim() || item.nom;
+    const dinTag = item.din ? `<span style="font-size:10px;color:var(--text3);font-family:var(--font-code);margin-left:6px">${item.din}</span>` : '';
+    const searchKey = `${item.nom} ${item.din} ${ref}`.toLowerCase();
+    return `<div class="quick-item" data-search="${searchKey}" onclick="addFromCataleg(${JSON.stringify(item).replace(/"/g,'&quot;')})">
+      <div class="quick-item-left">
+        <span class="quick-item-name">${item.nom}${dinTag}</span>
+        <span class="quick-item-ref">${ref || '—'}</span>
+      </div>
+      <button class="quick-item-add">+ Afegir</button>
+    </div>`;
+  }).join('');
+  const titol = grup.grup.replace(/Calaix \d+ — /,'');
+  return `
+  <div class="back-row">
+    <button class="back-btn" onclick="mxpCalaix=null;render()">← Calaixos</button>
+    <span class="page-title">${titol}</span>
+  </div>
+  <div class="card">
+    <div class="card-head">
+      <span class="card-title">${grup.grup}</span>
+      <span class="card-sub">${grup.items.length} referències</span>
+    </div>
+    <div class="card-body">
+      <input class="search-bar" type="text" placeholder="Cerca per nom o codi..." oninput="filterCataleg(this.value)">
+      <div class="quick-list">${rows}</div>
+    </div>
+  </div>
+  ${renderDraftCard()}`;
+}
+
+/* ---- Helper: draft flotant per a MXP ---- */
+function renderDraftCard() {
+  if (!draft.length) return '';
+  const draftRows = draft.map((d,i) => `<tr>
+    <td><span class="ref-mono" style="font-size:11px">${d.ref}</span>${d.nom?`<span style="font-size:10px;color:var(--text3);margin-left:5px">${d.nom}</span>`:''}</td>
+    <td><input class="qty-input" type="number" min="1" value="${d.qty}" oninput="draft[${i}].qty=Math.max(1,+this.value)"></td>
+    <td><button class="del-btn" onclick="removeDraft(${i})">×</button></td>
+  </tr>`).join('');
+  return `<div class="card" style="margin-top:14px">
+    <div class="card-head">
+      <span class="card-title">Petició actual</span>
+      <span class="card-sub">${draft.length} referència${draft.length>1?'es':''}</span>
+    </div>
+    <div style="overflow-x:auto"><table>
+      <thead><tr><th style="width:55%">Referència</th><th style="width:20%">Qty</th><th style="width:25%"></th></tr></thead>
+      <tbody>${draftRows}</tbody>
+    </table></div>
+    <div class="card-actions">
+      <button class="btn-send" onclick="submitPeticio()">Enviar petició</button>
+      <button class="btn-clear" onclick="draft=[];render()">Netejar</button>
+    </div>
+  </div>`;
+}
+
+/* ---- PETICIÓ (altres seccions) ---- */
+let addForm = { tip:'', din:'', met:'', lon:'', qty:1, loc:'' };
+
+const CATALEG_ALIAS = { 'Intralox P9': 'Intralox', 'Rodets P8': 'Rodets' };
+function getCataleg(sec) { return CATALEG[CATALEG_ALIAS[sec] || sec]; }
+function hasCataleg(sec) { return !!getCataleg(sec); }
+
+function renderPeticio() {
+  const pend = pendingFor(currentSeccio);
+  const pendQty = pend.reduce((a,p) => a+p.qty, 0);
+  const hasCat = hasCataleg(currentSeccio);
+  // default to cataleg if available
+  if (hasCat && addMode === 'custom') { /* keep */ } else if (hasCat) { addMode = 'cataleg'; } else { addMode = 'custom'; }
+
+  const banner = pendQty > 0
+    ? `<div class="banner"><div class="banner-dot"></div><strong>${pendQty} unitat${pendQty>1?'s':''} sense estoc</strong>&nbsp;de setmanes anteriors — cargoleria no ha pogut entregar-les. Es mostren a sota i s'entregaran quan hi hagi estoc.</div>`
+    : '';
+
+  const pendRows = pend.map(p => {
+    const age = weekAge(p.week);
+    return `<tr class="${age>=2?'pend2':'pend1'}">
+      <td><span class="ref-mono">${p.ref}</span><span class="week-tag ${age>=2?'old':'recent'}">${weekLabel(p.week)}</span></td>
+      <td class="loc-text">${p.loc||'—'}</td>
+      <td><span class="qty-badge">${p.qty}</span></td>
+      <td><span class="badge badge-stock">Sense estoc</span></td>
+    </tr>`;
+  }).join('');
+
+  const draftRows = draft.map((d,i) => `<tr>
+    <td><span class="ref-mono">${d.ref}</span>${d.nom?`<span style="font-size:11px;color:var(--text3);margin-left:6px">${d.nom}</span>`:''}</td>
+    <td class="loc-text">${d.loc||'—'}</td>
+    <td><input class="qty-input" type="number" min="1" value="${d.qty}" oninput="draft[${i}].qty=Math.max(1,+this.value)"></td>
+    <td><button class="del-btn" onclick="removeDraft(${i})">×</button></td>
+  </tr>`).join('');
+
+  const hasRef = addForm.tip && addForm.met;
+  const refCode = hasRef ? `${addForm.tip.toUpperCase()} M${addForm.met}${addForm.lon?'×'+addForm.lon:''}` : '';
+
+  const modeToggle = hasCat ? `<div class="mode-toggle">
+    <button class="mode-btn ${addMode==='cataleg'?'active':''}" onclick="addMode='cataleg';render()">Llista ràpida</button>
+    <button class="mode-btn ${addMode==='custom'?'active':''}" onclick="addMode='custom';render()">Referència manual</button>
+  </div>` : '';
+
+  let formBody = '';
+  if (addMode === 'cataleg' && hasCat) {
+    const totalItems = getCataleg(currentSeccio).reduce((a,g) => a+g.items.length, 0);
+    const searchBar = totalItems > 20
+      ? `<input class="search-bar" type="text" id="cat-search" placeholder="Cerca per nom, DIN o referència..." oninput="filterCataleg(this.value)">`
+      : '';
+    const groups = getCataleg(currentSeccio).map(g => {
+      const items = g.items.map(item => {
+        const ref = `${item.tip ? item.tip+' ' : ''}${item.met?'M'+item.met:''}${item.lon?'×'+item.lon:''}`;
+        const dinTag = item.din ? `<span style="font-size:10px;color:var(--text3);font-family:var(--font-code);margin-left:6px">${item.din}</span>` : '';
+        const searchKey = `${item.nom} ${item.din} ${ref}`.toLowerCase();
+        return `<div class="quick-item" data-search="${searchKey}" onclick="addFromCataleg(${JSON.stringify(item).replace(/"/g,'&quot;')})">
+          <div class="quick-item-left">
+            <span class="quick-item-name">${item.nom}${dinTag}</span>
+            <span class="quick-item-ref">${ref||'—'}</span>
+          </div>
+          <button class="quick-item-add">+ Afegir</button>
+        </div>`;
+      }).join('');
+      return `<div class="cat-group" data-grup="${g.grup}"><span class="cat-label">${g.grup}</span><div class="quick-list">${items}</div></div>`;
+    }).join('');
+    formBody = `<div class="card-body">${searchBar}${groups}</div>`;
+  } else {
+    formBody = `<div class="card-body">
+      <div class="form-grid">
+        <div class="field">
+          <label>Tipologia</label>
+          <select id="f-tip" onchange="addForm.tip=this.value;rerenderPreview()">
+            <option value="">— Tipus —</option>
+            ${TIPOLOGIES.map(t=>`<option value="${t}" ${addForm.tip===t?'selected':''}>${t}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field">
+          <label>Mètric (mm)</label>
+          <select id="f-met" onchange="addForm.met=this.value;rerenderPreview()">
+            <option value="">— M —</option>
+            ${METRICS.map(m=>`<option value="${m}" ${addForm.met==m?'selected':''}>${m}</option>`).join('')}
+          </select>
+        </div>
+        <div class="field">
+          <label>Longitud (mm)</label>
+          <select id="f-lon" onchange="addForm.lon=this.value;rerenderPreview()">
+            <option value="">— (opc.) —</option>
+            ${LONGITUDS.map(l=>`<option value="${l}" ${addForm.lon==l?'selected':''}>${l}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+      <div class="form-grid-2">
+        <div class="field">
+          <label>DIN (opcional)</label>
+          <input type="text" id="f-din" placeholder="ex: 933, 985, 7380..." value="${addForm.din}" oninput="addForm.din=this.value;rerenderPreview()">
+        </div>
+        <div class="field">
+          <label>Ubicació / descripció (opcional)</label>
+          <input type="text" id="f-loc" placeholder="ex: eix costelles, plàstic lateral..." value="${addForm.loc}" oninput="addForm.loc=this.value">
+        </div>
+      </div>
+      <div id="ref-preview" class="ref-preview">
+        ${hasRef ? `<span class="ref-code">${refCode}</span><span style="font-size:12px;color:var(--text3)">${addForm.tip} · M${addForm.met}${addForm.lon?' · '+addForm.lon+'mm':''}</span>`
+                 : `<span class="ref-placeholder">Selecciona tipologia i mètric</span>`}
+      </div>
+      <div class="form-bottom">
+        <div class="field">
+          <label>Quantitat</label>
+          <input type="number" min="1" value="${addForm.qty}" id="f-qty" oninput="addForm.qty=Math.max(1,+this.value)">
+        </div>
+        <button class="btn-add" onclick="addToDraft()" ${!hasRef?'disabled':''}>Afegir a la petició</button>
+      </div>
+    </div>`;
+  }
+
+  return `
+  <div class="back-row">
+    <button class="back-btn" onclick="currentSeccio=null;render()">← Seccions</button>
+    <span class="page-title">${currentSeccio}</span>
+  </div>
+  ${banner}
+
+  <div class="card">
+    <div class="card-head">
+      <span class="card-title">Afegir referència</span>
+      ${modeToggle}
+    </div>
+    ${formBody}
+  </div>
+
+  ${draft.length > 0 ? `<div class="card">
+    <div class="card-head">
+      <span class="card-title">Petició actual</span>
+      <span class="card-sub">${draft.length} referència${draft.length>1?'es':''}</span>
+    </div>
+    <div style="overflow-x:auto"><table>
+      <thead><tr><th style="width:40%">Referència</th><th style="width:28%">Ubicació</th><th style="width:15%">Qty</th><th style="width:17%"></th></tr></thead>
+      <tbody>${draftRows}</tbody>
+    </table></div>
+    <div class="card-actions">
+      <button class="btn-send" onclick="submitPeticio()">Enviar petició</button>
+      <button class="btn-clear" onclick="draft=[];render()">Netejar</button>
+    </div>
+  </div>` : ''}
+
+  ${pend.length > 0 ? `<div class="card">
+    <div class="card-head">
+      <span class="card-title">Sense estoc — pendent d'entrega</span>
+      <span class="badge badge-pend">${pendQty} ut.</span>
+    </div>
+    <div style="overflow-x:auto"><table>
+      <thead><tr><th style="width:40%">Referència</th><th style="width:30%">Ubicació</th><th style="width:15%">Qty</th><th style="width:15%">Estat</th></tr></thead>
+      <tbody>${pendRows}</tbody>
+    </table></div>
+  </div>` : ''}`;
+}
+
+function filterCataleg(q) {
+  const query = q.toLowerCase().trim();
+  document.querySelectorAll('.quick-item').forEach(el => {
+    const match = !query || el.dataset.search.includes(query);
+    el.style.display = match ? '' : 'none';
+  });
+  document.querySelectorAll('.cat-group').forEach(g => {
+    const visible = [...g.querySelectorAll('.quick-item')].some(el => el.style.display !== 'none');
+    g.style.display = visible ? '' : 'none';
+  });
+}
+
+function addFromCataleg(item) {
+  const ref = `${item.tip ? item.tip+' ' : ''}${item.met?'M'+item.met:''}${item.lon?'×'+item.lon:''}`;
+  const dinStr = item.din ? ` ${item.din}` : '';
+  const fullRef = (ref + dinStr).trim() || item.nom;
+  const existing = draft.findIndex(d => d.ref === fullRef && d.nom === item.nom);
+  if (existing >= 0) { draft[existing].qty += 1; }
+  else draft.push({ ref: fullRef, nom: item.nom, tip: item.tip, din: item.din, met: item.met, lon: item.lon, qty: 1, loc: item.nom });
+  showToast(`Afegit: ${item.nom}`);
+  render();
+}
+
+function rerenderPreview() {
+  const hasRef = addForm.tip && addForm.met;
+  const dinStr = addForm.din ? ` DIN${addForm.din}` : '';
+  const refCode = hasRef ? `${addForm.tip.toUpperCase()} M${addForm.met}${addForm.lon?'×'+addForm.lon:''}${dinStr}` : '';
+  const el = document.getElementById('ref-preview');
+  if (!el) return;
+  if (hasRef) {
+    el.innerHTML = `<span class="ref-code">${refCode}</span><span style="font-size:12px;color:var(--text3)">${addForm.tip} · M${addForm.met}${addForm.lon?' · '+addForm.lon+'mm':''}${addForm.din?' · DIN '+addForm.din:''}</span>`;
+  } else {
+    el.innerHTML = `<span class="ref-placeholder">Selecciona tipologia i mètric</span>`;
+  }
+  const addBtn = document.querySelector('.btn-add');
+  if (addBtn) addBtn.disabled = !hasRef;
+}
+
+function addToDraft() {
+  const { tip, din, met, lon, qty, loc } = addForm;
+  if (!tip || !met) return;
+  const dinStr = din ? ` DIN${din}` : '';
+  const ref = `${tip.toUpperCase()} M${met}${lon?'×'+lon:''}${dinStr}`;
+  const existing = draft.findIndex(d => d.ref === ref && d.loc === loc);
+  if (existing >= 0) draft[existing].qty += qty;
+  else draft.push({ ref, tip, din, met, lon, qty, loc, nom:'' });
+  addForm = { tip: addForm.tip, din: addForm.din, met: addForm.met, lon: addForm.lon, qty: 1, loc: '' };
+  render();
+}
+
+function checkNum(val) {
+  const t = TREBALLADORS.find(t => t.num === val.trim());
+  const fb = document.getElementById('num-feedback');
+  if (!fb) return;
+  if (t) {
+    fb.style.color = 'var(--success)';
+    fb.textContent = `Identificat: ${t.nom}`;
+    setTimeout(() => {
+      responsableNum = val.trim();
+      localStorage.setItem('carg_responsable_num', responsableNum);
+      render();
+    }, 600);
+  } else if (val.length >= 3) {
+    fb.style.color = 'var(--danger)';
+    fb.textContent = 'Número no trobat';
+  } else {
+    fb.style.color = 'var(--text3)';
+    fb.textContent = 'Introdueix el teu número';
+  }
+}
+
+function removeDraft(i) { draft.splice(i, 1); render(); }
+
+function submitPeticio() {
+  if (!draft.length) return;
+  if (!responsableNum) {
+    showToast('Cal identificar-se primer');
+    currentSeccio = null; mxpSubseccio = null; mxpCalaix = null;
+    render();
+    return;
+  }
+  const nom = getResponsableNom();
+  const entries = draft.map((d, i) => ({
+    id: Date.now() + '_' + i,
+    seccio: currentSeccio,
+    responsable: `${nom} (#${responsableNum})`,
+    ref: d.ref, loc: d.loc, qty: d.qty,
+    estat: 'Pendent', week: curWeek,
+    ts: new Date().toLocaleDateString('ca')
+  }));
+  peticions = [...peticions, ...entries];
+  save();
+  draft = [];
+  showToast(`Petició enviada per ${nom}: ${entries.length} referència${entries.length>1?'es':''}`);
+  render();
+}
+
+/* ---- CARGOLERIA ---- */
+function setCarFilter(f) {
+  cargFilter = f;
+  render();
+}
+
+function updateEstat(id, val) {
+  if (val === 'Parcial') {
+    const p = peticions.find(p => p.id === id);
+    if (!p) return;
+    showParcialModal(p);
+    // Reset select back to current value
+    const sel = document.querySelector(`select[onchange*="${id}"]`);
+    if (sel) sel.value = p.estat;
+    return;
+  }
+  peticions = peticions.map(p => p.id === id ? {...p, estat: val} : p);
+  save();
+  render();
+}
+
+function showParcialModal(p) {
+  const overlay = document.createElement('div');
+  overlay.id = 'parcial-overlay';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:9999';
+  overlay.innerHTML = `
+    <div style="background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:24px;width:320px;box-shadow:0 8px 32px rgba(0,0,0,0.4)">
+      <div style="font-size:15px;font-weight:500;color:var(--text);margin-bottom:4px">Entrega parcial</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:16px">${p.ref} · ${p.qty} ut. sol·licitades</div>
+      <div class="field" style="margin-bottom:16px">
+        <label>Quantes unitats s'entreguen?</label>
+        <input type="number" id="parcial-qty" min="1" max="${p.qty - 1}" value="1"
+          style="font-size:18px;text-align:center;padding:10px;letter-spacing:2px">
+        <div id="parcial-rest" style="font-size:12px;color:var(--text3);margin-top:6px;text-align:center">
+          Quedaran <strong>${p.qty - 1}</strong> ut. pendents
+        </div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-send" style="flex:1" onclick="confirmParcial('${p.id}')">Confirmar</button>
+        <button class="btn-clear" onclick="closeParcialModal()">Cancel·lar</button>
+      </div>
+    </div>`;
+  overlay.querySelector('#parcial-qty').addEventListener('input', function() {
+    const entregades = Math.min(Math.max(1, +this.value), p.qty - 1);
+    const restants = p.qty - entregades;
+    overlay.querySelector('#parcial-rest').innerHTML = `Quedaran <strong>${restants}</strong> ut. pendents`;
+  });
+  document.body.appendChild(overlay);
+  setTimeout(() => overlay.querySelector('#parcial-qty').focus(), 50);
+}
+
+function closeParcialModal() {
+  const el = document.getElementById('parcial-overlay');
+  if (el) el.remove();
+  render();
+}
+
+function confirmParcial(id) {
+  const p = peticions.find(p => p.id === id);
+  if (!p) return;
+  const input = document.getElementById('parcial-qty');
+  const entregades = Math.min(Math.max(1, +input.value), p.qty - 1);
+  const restants = p.qty - entregades;
+  // Mark original as Parcial with delivered qty
+  peticions = peticions.map(q => q.id === id
+    ? {...q, estat: 'Parcial', qtyEntregat: entregades, qty: entregades}
+    : q
+  );
+  // Create new pending entry for the remainder
+  peticions.push({
+    ...p,
+    id: Date.now() + '_r',
+    qty: restants,
+    estat: 'Pendent',
+    qtyEntregat: 0,
+    ts: new Date().toLocaleDateString('ca')
+  });
+  save();
+  closeParcialModal();
+}
+
+function exportCSV() {
+  const rows = [
+    ['Secció','Referència','Ubicació','Responsable','Quantitat','Estat','Setmana','Data'],
+    ...peticions.map(p => [p.seccio, p.ref, p.loc||'', p.responsable||'', p.qty, p.estat, p.week, p.ts||''])
+  ];
+  const csv = '\uFEFF' + rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\r\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url;
+  a.download = 'cargoleria_' + curWeek + '.csv'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function renderCargoleria() {
+  const tot = peticions.length;
+  const pend = peticions.filter(p => p.estat === 'Pendent').length;
+  const ent = peticions.filter(p => p.estat === 'Entregat').length;
+
+  const filtered = cargFilter === 'all' ? peticions : peticions.filter(p => p.estat === cargFilter);
+
+  // Group by secció
+  const bySec = {};
+  filtered.forEach(p => { if (!bySec[p.seccio]) bySec[p.seccio] = []; bySec[p.seccio].push(p); });
+
+  let tableBody = '';
+  if (!filtered.length) {
+    tableBody = '<tr><td colspan="7" class="empty">Cap petició trobada</td></tr>';
+  } else {
+    Object.entries(bySec).forEach(([sec, items]) => {
+      tableBody += `<tr><td colspan="7" class="seccio-header">${sec}</td></tr>`;
+      items.sort((a,b) => a.week.localeCompare(b.week)).forEach(p => {
+        const age = weekAge(p.week);
+        const cls = p.estat === 'Pendent' && age >= 2 ? 'pend2' : p.estat === 'Pendent' && age >= 1 ? 'pend1' : '';
+        const badge = p.estat === 'Entregat' ? 'badge-done' : p.estat === 'Sense estoc' ? 'badge-stock' : p.estat === 'Parcial' ? 'badge-parcial' : 'badge-pend';
+        const badgeLabel = p.estat === 'Parcial' ? `Parcial (${p.qtyEntregat||'?'}/${p.qty + (p.qtyEntregat||0)})` : p.estat;
+        tableBody += `<tr class="${cls}">
+          <td><span class="ref-mono">${p.ref}</span>${age > 0 ? `<span class="week-tag ${age>=2?'old':'recent'}">${weekLabel(p.week)}</span>` : ''}</td>
+          <td class="loc-text">${p.loc||'—'}</td>
+          <td class="loc-text" style="font-size:12px">${p.responsable||'—'}</td>
+          <td style="text-align:center;font-family:var(--font-code);font-weight:600">${p.qty}</td>
+          <td class="loc-text" style="font-size:12px">${p.ts||'—'}</td>
+          <td><span class="badge ${badge}" style="font-size:11px">${badgeLabel}</span></td>
+          <td><select class="status-sel" onchange="updateEstat('${p.id}',this.value)">
+            <option value="Pendent" ${p.estat==='Pendent'?'selected':''}>Pendent</option>
+            <option value="Parcial" ${p.estat==='Parcial'?'selected':''}>Parcial</option>
+            <option value="Entregat" ${p.estat==='Entregat'?'selected':''}>Entregat</option>
+            <option value="Sense estoc" ${p.estat==='Sense estoc'?'selected':''}>Sense estoc</option>
+          </select></td>
+        </tr>`;
+      });
+    });
+  }
+
+  const filters = [['all','Totes'],['Pendent','Pendents'],['Parcial','Parcials'],['Entregat','Entregades'],['Sense estoc','Sense estoc']];
+
+  return `
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-lbl">Total peticions</div><div class="stat-val">${tot}</div></div>
+    <div class="stat-card"><div class="stat-lbl">Pendents</div><div class="stat-val warn">${pend}</div></div>
+    <div class="stat-card"><div class="stat-lbl">Entregades</div><div class="stat-val ok">${ent}</div></div>
+  </div>
+  <div class="filter-row">
+    ${filters.map(([f,l]) => `<button class="carf-btn filter-btn ${f===cargFilter?'active':''}" data-f="${f}">${l}</button>`).join('')}
+    <button class="export-btn filter-row-right" onclick="exportCSV()">
+      <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1v8M3.5 6.5l3 3 3-3M1.5 10.5h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Exportar CSV
+    </button>
+  </div>
+  <div class="card">
+    <div style="overflow-x:auto"><table>
+      <thead><tr>
+        <th style="width:26%">Referència</th>
+        <th style="width:18%">Ubicació</th>
+        <th style="width:13%">Responsable</th>
+        <th style="width:7%;text-align:center">Qty</th>
+        <th style="width:10%">Data</th>
+        <th style="width:10%">Estat</th>
+        <th style="width:16%">Canviar estat</th>
+      </tr></thead>
+      <tbody>${tableBody}</tbody>
+    </table></div>
+  </div>`;
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.className = 'toast show';
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+render();
+</script>
+</body>
+</html>
